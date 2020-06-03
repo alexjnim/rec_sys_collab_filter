@@ -6,7 +6,3 @@ Sci-Kit Surprise
 Guidance from online resources:
 Building Recommender Systems with Machine Learning and AI by Frank Kane
 Sci-Kit Surprise Documentation
-
-Data acquired from:
-https://github.com/zygmuntz/goodbooks-10k
-https://www.kaggle.com/CooperUnion/anime-recommendations-database?select=rating.csv
