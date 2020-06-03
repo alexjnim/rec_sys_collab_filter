@@ -21,19 +21,19 @@ class DataLoader:
         self.itemName_column = itemName_column
         self.size_of_data = size_of_data
 
-    def loadData(self):
+    def loadData(self, rating_scale_min, rating_scale_max):
         self.items_df = pd.read_csv(self.itemsPath)
 
         self.ratings_df = pd.read_csv(self.ratingsPath)
         self.ratings_df = self.ratings_df[:self.size_of_data]
         self.ratings_df = self.ratings_df[[self.userID_column, self.itemID_column, self.ratings_column]]
 
-        reader = Reader(rating_scale=(1, 5))
+        reader = Reader(rating_scale=(rating_scale_min, rating_scale_max))
         self.ratingsDataset = Dataset.load_from_df(self.ratings_df, reader)
 
         return self.ratingsDataset
 
-    def addUserLoadData(self, new_rows):
+    def addUserLoadData(self, new_rows, rating_scale_min, rating_scale_max):
         self.items_df = pd.read_csv(self.itemsPath)
 
         self.ratings_df = pd.read_csv(self.ratingsPath)
@@ -42,7 +42,7 @@ class DataLoader:
 
         self.ratings_df = self.ratings_df[[self.userID_column, self.itemID_column, self.ratings_column]]
 
-        reader = Reader(rating_scale=(1, 5))
+        reader = Reader(rating_scale=(rating_scale_min, rating_scale_max))
         self.ratingsDataset = Dataset.load_from_df(self.ratings_df, reader)
 
         return self.ratingsDataset
