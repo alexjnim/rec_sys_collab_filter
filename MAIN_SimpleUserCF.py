@@ -14,12 +14,12 @@ def loadrecs_usercf(data, testUser):
                }
     model = KNNBasic(sim_options=sim_options)
     model.fit(trainSet)
-    
+
     simsMatrix = model.compute_similarities()
-    
+
     testUserInnerID = trainSet.to_inner_uid(testUser)
     similarityRow = simsMatrix[testUserInnerID]
-    
+
     # removing the testUser from the similarityRow
     similarUsers = []
     for innerID, score in enumerate(similarityRow):
@@ -27,7 +27,14 @@ def loadrecs_usercf(data, testUser):
             similarUsers.append( (innerID, score) )
     # find the k users largest similarities
     kNeighbors = heapq.nlargest(k, similarUsers, key=lambda t: t[1])
-    
+
+
+    #or can tune for ratings > threshold
+    #kNeighbors = []
+    #for rating in similarUsers:
+    #    if rating[1] > 4:
+    #        kNeighbors.append(rating)
+
     # Get the stuff the k users rated, and add up ratings for each item, weighted by user similarity
     # candidates will hold all possible items(movies) and combined rating from all k users
     candidates = defaultdict(float)
@@ -43,8 +50,8 @@ def loadrecs_usercf(data, testUser):
     watched = {}
     for itemID, rating in trainSet.ur[testUserInnerID]:
         watched[itemID] = 1
-        
-        
+
+
     # Get top-rated items from similar users:
     print('\n')
     pos = 0
@@ -143,7 +150,3 @@ new_rows
 data = ml.addUserLoadData(new_rows, rating_scale_min, rating_scale_max)
 
 loadrecs_usercf(data, mockUserID)
-
-
-
-

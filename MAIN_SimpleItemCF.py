@@ -15,14 +15,20 @@ def loadrecs_itemcf(data, testUser):
                    }
     model = KNNBasic(sim_options=sim_options)
     model.fit(trainSet)
-    
+
     simsMatrix = model.compute_similarities()
 
     testUserInnerID = trainSet.to_inner_uid(testUser)
     # Get the top K items we rated
     testUserRatings = trainSet.ur[testUserInnerID]
-    
+
     kNeighbors = heapq.nlargest(k, testUserRatings, key=lambda t: t[1])
+
+    #or look for items with rating > threshold
+    #kNeighbors = []
+    #for rating in testUserRatings:
+    #    if rating[1] > 4.0:
+    #        kNeighbors.append(rating)
     
     # Get similar items to stuff we liked (weighted by rating)
     candidates = defaultdict(float)
