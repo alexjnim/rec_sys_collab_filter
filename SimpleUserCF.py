@@ -27,7 +27,7 @@ print('shape of ratings is now: ', ratings.shape)
 items = pd.read_csv(items_path)
 
 result = pd.merge(ratings, items, how='left', on=['book_id'])
-merged_data = result[['user_id', 'book_id', 'title', 'rating']]
+merged_data = result[[userID_column, itemID_column, itemName_column, ratings_column]]
 # -
 
 testUser = 78
@@ -191,5 +191,3 @@ for itemID, ratingSum in sorted(candidates.items(), key=itemgetter(1), reverse=T
         pos += 1
         if (pos > 8):
             break
-
-
