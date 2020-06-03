@@ -13,6 +13,8 @@ itemID_column = 'book_id'
 userID_column = 'user_id'
 ratings_column = 'rating'
 itemName_column = 'title'
+ratings_scale_min = 1
+ratings_scale_max = 5
 
 # please check how large your ratings.csv is, the larger it is the longer it'll take to run!
 # 5 million entries is far too much!
@@ -26,8 +28,8 @@ ratings = ratings[:size_of_data]
 print('shape of ratings is now: ', ratings.shape)
 items = pd.read_csv(items_path)
 
-result = pd.merge(ratings, items, how='left', on=['book_id'])
-merged_data = result[['user_id', 'book_id', 'title', 'rating']]
+result = pd.merge(ratings, items[[itemID_column, itemName_column]], how='left', on=[itemID_column])
+merged_data = result[[userID_column, itemID_column, itemName_column, ratings_column]]
 # -
 
 testUser = 78
@@ -39,7 +41,7 @@ merged_data[merged_data['user_id'] == testUser].sort_values(by=['rating'], ascen
 
 # Load our data set and compute the user similarity matrix
 ml = DataLoader(items_path, ratings_path, userID_column, itemID_column, ratings_column, itemName_column, size_of_data)
-data = ml.loadData()
+data = ml.loadData(rating_scale_min, rating_scale_max)
 
 trainSet = data.build_full_trainset()
 
@@ -134,7 +136,7 @@ new_rows = pd.DataFrame(new_rows)
 new_rows
 
 ml = DataLoader(items_path, ratings_path, userID_column, itemID_column, ratings_column, itemName_column, size_of_data)
-data = ml.addUserLoadData(new_rows)
+data = ml.addUserLoadData(new_rows, rating_scale_min, rating_scale_max)
 
 trainSet = data.build_full_trainset()
 
@@ -191,5 +193,3 @@ for itemID, ratingSum in sorted(candidates.items(), key=itemgetter(1), reverse=T
         pos += 1
         if (pos > 8):
             break
-
-
