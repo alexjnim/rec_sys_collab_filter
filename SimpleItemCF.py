@@ -26,7 +26,7 @@ print('shape of ratings is now: ', ratings.shape)
 items = pd.read_csv(items_path)
 
 result = pd.merge(ratings, items, how='left', on=['book_id'])
-merged_data = result[['user_id', 'book_id', 'title', 'rating']]
+merged_data = result[[userID_column, itemID_column, itemName_column, ratings_column]]
 # -
 
 testUser = 78
@@ -91,7 +91,7 @@ max_rating = ratings['rating'].max()
 
 selected_items = [485, 592, 1041, 479, 95, 4106]
 selected_ratings = []
-#can manually input the ratings per item 
+#can manually input the ratings per item
 #selected_ratings = [5, 5, 5, 5, 5, 4]
 
 # +
@@ -157,7 +157,3 @@ for itemID, ratingSum in sorted(candidates.items(), key=itemgetter(1), reverse=T
         pos += 1
         if (pos > 10):
             break
-
-
-
-
