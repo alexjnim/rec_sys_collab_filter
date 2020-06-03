@@ -7,12 +7,14 @@ from operator import itemgetter
 import pandas as pd
 
 # +
-items_path = '../data/goodbooks-10k-master/books.csv'
-ratings_path = '../data/goodbooks-10k-master/ratings.csv'
-itemID_column = 'book_id'
+items_path = '../data/anime-rec-data/anime.csv'
+ratings_path = '../data/anime-rec-data/rating.csv'
+itemID_column = 'anime_id'
 userID_column = 'user_id'
 ratings_column = 'rating'
-itemName_column = 'title'
+itemName_column = 'name'
+rating_scale_min = 1
+rating_scale_max = 10
 
 # please check how large your ratings.csv is, the larger it is the longer it'll take to run!
 # 5 million entries is far too much!
@@ -25,7 +27,7 @@ ratings = ratings[:size_of_data]
 print('shape of ratings is now: ', ratings.shape)
 items = pd.read_csv(items_path)
 
-result = pd.merge(ratings, items, how='left', on=['book_id'])
+result = pd.merge(ratings, items[[itemID_column, itemName_column]], how='left', on=[itemID_column])
 merged_data = result[[userID_column, itemID_column, itemName_column, ratings_column]]
 # -
 
@@ -35,7 +37,7 @@ k = 10
 merged_data[merged_data['user_id'] == testUser].sort_values(by=['rating'], ascending =False)[:40]
 
 ml = DataLoader(items_path, ratings_path, userID_column, itemID_column, ratings_column, itemName_column, size_of_data)
-data = ml.loadData()
+data = ml.loadData(rating_scale_min, rating_scale_max)
 
 trainSet = data.build_full_trainset()
 
@@ -114,7 +116,7 @@ new_rows = pd.DataFrame(new_rows)
 # -
 
 ml = DataLoader(items_path, ratings_path, userID_column, itemID_column, ratings_column, itemName_column, size_of_data)
-data = ml.addUserLoadData(new_rows)
+data = ml.addUserLoadData(new_rows, rating_scale_min, rating_scale_max)
 
 trainSet = data.build_full_trainset()
 
