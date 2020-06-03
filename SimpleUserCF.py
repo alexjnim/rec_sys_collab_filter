@@ -20,7 +20,6 @@ ratings_scale_max = 5
 # 5 million entries is far too much!
 size_of_data = 100000
 
-
 # +
 ratings = pd.read_csv(ratings_path)
 print('shape of original ratings was: ', ratings.shape)
@@ -34,8 +33,6 @@ merged_data = result[[userID_column, itemID_column, itemName_column, ratings_col
 
 testUser = 78
 k = 10
-
-# ### looks like user 78 could be me!
 
 merged_data[merged_data['user_id'] == testUser].sort_values(by=['rating'], ascending =False)[:40]
 

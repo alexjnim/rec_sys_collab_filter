@@ -36,6 +36,7 @@ k = 10
 
 merged_data[merged_data['user_id'] == testUser].sort_values(by=['rating'], ascending =False)[:40]
 
+# Load our data set and compute the user similarity matrix
 ml = DataLoader(items_path, ratings_path, userID_column, itemID_column, ratings_column, itemName_column, size_of_data)
 data = ml.loadData(rating_scale_min, rating_scale_max)
 
