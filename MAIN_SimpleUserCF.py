@@ -26,15 +26,15 @@ def user_based_rec_loader(data, testUser, no_recs):
     for innerID, score in enumerate(similiarty_row):
         if (innerID != testUserInnerID):
             similarUsers.append( (innerID, score) )
-#     # find the k users largest similarities
-#     k = 10
-#     kNeighbors = heapq.nlargest(k, similarUsers, key=lambda t: t[1])
+    # find the k users largest similarities
+    k = 10
+    kNeighbors = heapq.nlargest(k, similarUsers, key=lambda t: t[1])
 
 #     or can tune for ratings > threshold
-    kNeighbors = []
-    for rating in similarUsers:
-       if rating[1] > 0.75:
-           kNeighbors.append(rating)
+#     kNeighbors = []
+#     for rating in similarUsers:
+#        if rating[1] > 0.75:
+#            kNeighbors.append(rating)
 
     
     # Get the stuff the k users rated, and add up ratings for each item, weighted by user similarity
@@ -127,7 +127,7 @@ testItemID = 485
 mockUserID = 0
 max_rating = ratings['rating'].max()
 
-selected_items = [485, 592, 1041, 479, 95, 4106]
+selected_items = [485, 592, 1041, 479, 95, 4106, 1135, 130, 959, 2342, 4634, 109, 172, 180, 10, 162, 1113]
 selected_ratings = []
 #can manually input the ratings per item
 #selected_ratings = [5, 5, 5, 5, 5, 4]
@@ -151,7 +151,8 @@ else:
 new_rows = pd.DataFrame(new_rows)
 # -
 
-new_rows
+result = pd.merge(new_rows, items[[itemID_column, itemName_column]], how='left', on=[itemID_column])
+result
 
 # # load new user and recommendations
 

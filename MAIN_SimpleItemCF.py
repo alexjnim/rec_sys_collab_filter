@@ -65,6 +65,7 @@ def item_based_rec_loader(data, testUser, no_recs):
                 break
     return pd.DataFrame(results)
 
+# +
 items_path = '../data/goodbooks-10k-master/books.csv'
 ratings_path = '../data/goodbooks-10k-master/ratings.csv'
 itemID_column = 'book_id'
@@ -74,9 +75,13 @@ itemName_column = 'title'
 rating_scale_min = 1
 rating_scale_max = 5
 
-# +
 # here we don't need to worry too much about the size of ratings.csv even though its 5 million rows!
 # with item-based CF, the dimensions of the similarity matrix will be the size of number of unique items, here 10,000
+# size_of_data = len(ratings)
+
+size_of_data = 10000
+
+# +
 ratings = pd.read_csv(ratings_path)
 items = pd.read_csv(items_path)
 
@@ -103,7 +108,7 @@ testItemID = 485
 mockUserID = 0
 max_rating = ratings['rating'].max()
 
-selected_items = [485, 592, 1041, 479, 95, 4106]
+selected_items = [485, 592, 1041, 479, 95, 4106, 1135, 130, 959, 2342, 4634, 109, 172, 180, 10, 162, 1113]
 selected_ratings = []
 #can manually input the ratings per item
 #selected_ratings = [5, 5, 5, 5, 5, 4]
