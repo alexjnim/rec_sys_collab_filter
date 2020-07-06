@@ -10,9 +10,14 @@ import pandas as pd
 def loadrecs_itemcf(data, testUser, no_recs):
 
     trainSet = data.build_full_trainset()
+    
+    # note that user_base: False here, thus we are telling KNN that 
+    # we want to generate an item-item based similarity matrix
     sim_options = {'name': 'cosine',
                    'user_based': False
                    }
+    
+    
     model = KNNBasic(sim_options=sim_options)
     model.fit(trainSet)
 
@@ -58,7 +63,6 @@ def loadrecs_itemcf(data, testUser, no_recs):
             if (pos > no_recs -1):
                 break
     return pd.DataFrame(results)
-
 
 # +
 items_path = '../data/goodbooks-10k-master/books.csv'
