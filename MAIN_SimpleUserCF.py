@@ -7,7 +7,7 @@ from operator import itemgetter
 import pandas as pd
 
 
-def loadrecs_usercf(data, testUser, k):
+def loadrecs_usercf(data, testUser, no_recs):
     trainSet = data.build_full_trainset()
     sim_options = {'name': 'cosine',
                'user_based': True
@@ -26,6 +26,7 @@ def loadrecs_usercf(data, testUser, k):
         if (innerID != testUserInnerID):
             similarUsers.append( (innerID, score) )
     # find the k users largest similarities
+    k = 10
     kNeighbors = heapq.nlargest(k, similarUsers, key=lambda t: t[1])
 
 
@@ -64,7 +65,7 @@ def loadrecs_usercf(data, testUser, k):
             results['book_title'].append(ml.getItemName(int(bookID)))
             results['rating_sum'].append(ratingSum)
             pos += 1
-            if (pos > k-1):
+            if (pos > no_recs -1):
                 break
                 
     return pd.DataFrame(results)

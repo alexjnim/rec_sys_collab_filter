@@ -7,7 +7,7 @@ from operator import itemgetter
 import pandas as pd
 
 
-def loadrecs_itemcf(data, testUser, k):
+def loadrecs_itemcf(data, testUser, no_recs):
 
     trainSet = data.build_full_trainset()
     sim_options = {'name': 'cosine',
@@ -20,8 +20,8 @@ def loadrecs_itemcf(data, testUser, k):
 
     testUserInnerID = trainSet.to_inner_uid(testUser)
     # Get the top K items we rated
+    k = 10
     testUserRatings = trainSet.ur[testUserInnerID]
-
     kNeighbors = heapq.nlargest(k, testUserRatings, key=lambda t: t[1])
 
     #or look for items with rating > threshold
@@ -55,7 +55,7 @@ def loadrecs_itemcf(data, testUser, k):
             results['book'].append(ml.getItemName(int(bookID)))
             results['rating_sum'].append(ratingSum)
             pos += 1
-            if (pos > k-1):
+            if (pos > no_recs -1):
                 break
     return pd.DataFrame(results)
 
