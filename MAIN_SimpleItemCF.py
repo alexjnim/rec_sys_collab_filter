@@ -7,7 +7,7 @@ from operator import itemgetter
 import pandas as pd
 
 
-def loadrecs_itemcf(data, testUser):
+def loadrecs_itemcf(data, testUser, k):
 
     trainSet = data.build_full_trainset()
     sim_options = {'name': 'cosine',
@@ -41,18 +41,23 @@ def loadrecs_itemcf(data, testUser):
     watched = {}
     for itemID, rating in trainSet.ur[testUserInnerID]:
         watched[itemID] = 1
-
+    
+    # Build a dictionary for results
+    results = {'book': [], 'rating_sum': []}
+    
     # Get top-rated items from similar users:
     print('\n')
     pos = 0
     for itemID, ratingSum in sorted(candidates.items(), key=itemgetter(1), reverse=True):
         if not itemID in watched:
-            movieID = trainSet.to_raw_iid(itemID)
-            print(ml.getItemName(int(movieID)), ratingSum)
+            bookID = trainSet.to_raw_iid(itemID)
+#             print(ml.getItemName(int(bookID)), ratingSum)
+            results['book'].append(ml.getItemName(int(bookID)))
+            results['rating_sum'].append(ratingSum)
             pos += 1
-            if (pos > 10):
+            if (pos > k-1):
                 break
-    return
+    return pd.DataFrame(results)
 
 
 # +
@@ -81,15 +86,13 @@ merged_data = result[[userID_column, itemID_column, itemName_column, ratings_col
 # -
 
 testUser = 78
-k = 10
-
-merged_data[merged_data['user_id'] == testUser].sort_values(by=['rating'], ascending =False)[:40].head(20)
+merged_data[merged_data['user_id'] == testUser].sort_values(by=['rating'], ascending =False).head(20)
 
 # Load our data set and compute the user similarity matrix
 ml = DataLoader(items_path, ratings_path, userID_column, itemID_column, ratings_column, itemName_column, size_of_data)
 data = ml.loadData(rating_scale_min, rating_scale_max)
 
-loadrecs_itemcf(data, testUser)
+loadrecs_itemcf(data, testUser, 10)
 
 # # select a single item and find items similar to that
 #
@@ -123,8 +126,15 @@ else:
         new_rows[ratings_column].append(max_rating)
 
 new_rows = pd.DataFrame(new_rows)
+# -
+
+result = pd.merge(new_rows, items[[itemID_column, itemName_column]], how='left', on=[itemID_column])
+result
 
 # +
 data = ml.addUserLoadData(new_rows, rating_scale_min, rating_scale_max)
 
-loadrecs_itemcf(data, mockUserID)
+loadrecs_itemcf(data, mockUserID, 10)
+# -
+
+

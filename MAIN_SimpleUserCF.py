@@ -7,7 +7,7 @@ from operator import itemgetter
 import pandas as pd
 
 
-def loadrecs_usercf(data, testUser):
+def loadrecs_usercf(data, testUser, k):
     trainSet = data.build_full_trainset()
     sim_options = {'name': 'cosine',
                'user_based': True
@@ -50,18 +50,24 @@ def loadrecs_usercf(data, testUser):
     watched = {}
     for itemID, rating in trainSet.ur[testUserInnerID]:
         watched[itemID] = 1
-
-
+   
+    # Build a dictionary for results
+    results = {'book_title': [], 'rating_sum': []}
+            
     # Get top-rated items from similar users:
     print('\n')
     pos = 0
     for itemID, ratingSum in sorted(candidates.items(), key=itemgetter(1), reverse=True):
         if itemID not in watched:
-            movieID = trainSet.to_raw_iid(itemID)
-            print(ml.getItemName(int(movieID)), ratingSum)
+            bookID = trainSet.to_raw_iid(itemID)
+#             print(ml.getItemName(int(bookID)), ratingSum)
+            results['book_title'].append(ml.getItemName(int(bookID)))
+            results['rating_sum'].append(ratingSum)
             pos += 1
-            if (pos > 8):
+            if (pos > k-1):
                 break
+                
+    return pd.DataFrame(results)
 
 # # change project variables
 
@@ -95,9 +101,8 @@ merged_data = result[[userID_column, itemID_column, itemName_column, ratings_col
 # # choose a user and the numeber of recommendations wanted
 
 testUser = 78
-k = 10
 
-merged_data[merged_data['user_id'] == testUser].sort_values(by=['rating'], ascending =False)[:40]
+merged_data[merged_data['user_id'] == testUser].sort_values(by=['rating'], ascending =False).head(20)
 
 # # load data
 
@@ -107,7 +112,7 @@ data = ml.loadData(rating_scale_min, rating_scale_max)
 
 # # run for recommendations
 
-loadrecs_usercf(data, testUser)
+loadrecs_usercf(data, testUser, 10)
 
 # # create a new user and get recommendations
 #
@@ -149,4 +154,6 @@ new_rows
 
 data = ml.addUserLoadData(new_rows, rating_scale_min, rating_scale_max)
 
-loadrecs_usercf(data, mockUserID)
+loadrecs_usercf(data, mockUserID, 10)
+
+
