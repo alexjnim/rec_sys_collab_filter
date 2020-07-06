@@ -33,7 +33,7 @@ def user_based_rec_loader(data, testUser, no_recs):
 #     or can tune for ratings > threshold
     kNeighbors = []
     for rating in similarUsers:
-       if rating[1] > 0.8:
+       if rating[1] > 0.75:
            kNeighbors.append(rating)
 
     
