@@ -7,7 +7,8 @@ from operator import itemgetter
 import pandas as pd
 
 
-def loadrecs_usercf(data, testUser, no_recs):
+# +
+def user_based_rec_loader(data, testUser, no_recs):
     trainSet = data.build_full_trainset()
     sim_options = {'name': 'cosine',
                'user_based': True
@@ -15,27 +16,27 @@ def loadrecs_usercf(data, testUser, no_recs):
     model = KNNBasic(sim_options=sim_options)
     model.fit(trainSet)
 
-    simsMatrix = model.compute_similarities()
+    similarity_matrix = model.compute_similarities()
 
     testUserInnerID = trainSet.to_inner_uid(testUser)
-    similarityRow = simsMatrix[testUserInnerID]
+    similiarty_row = similarity_matrix[testUserInnerID]
 
-    # removing the testUser from the similarityRow
+    # removing the testUser from the similiarty_row
     similarUsers = []
-    for innerID, score in enumerate(similarityRow):
+    for innerID, score in enumerate(similiarty_row):
         if (innerID != testUserInnerID):
             similarUsers.append( (innerID, score) )
-    # find the k users largest similarities
-    k = 10
-    kNeighbors = heapq.nlargest(k, similarUsers, key=lambda t: t[1])
+#     # find the k users largest similarities
+#     k = 10
+#     kNeighbors = heapq.nlargest(k, similarUsers, key=lambda t: t[1])
 
+#     or can tune for ratings > threshold
+    kNeighbors = []
+    for rating in similarUsers:
+       if rating[1] > 0.8:
+           kNeighbors.append(rating)
 
-    #or can tune for ratings > threshold
-    #kNeighbors = []
-    #for rating in similarUsers:
-    #    if rating[1] > 4:
-    #        kNeighbors.append(rating)
-
+    
     # Get the stuff the k users rated, and add up ratings for each item, weighted by user similarity
     # candidates will hold all possible items(movies) and combined rating from all k users
     candidates = defaultdict(float)
@@ -48,9 +49,9 @@ def loadrecs_usercf(data, testUser, no_recs):
             candidates[rating[0]] += (rating[1] / 5.0) * userSimilarityScore
 
     # Build a dictionary of stuff the user has already seen
-    watched = {}
+    excluded = {}
     for itemID, rating in trainSet.ur[testUserInnerID]:
-        watched[itemID] = 1
+        excluded[itemID] = 1
    
     # Build a dictionary for results
     results = {'book_title': [], 'rating_sum': []}
@@ -59,7 +60,7 @@ def loadrecs_usercf(data, testUser, no_recs):
     print('\n')
     pos = 0
     for itemID, ratingSum in sorted(candidates.items(), key=itemgetter(1), reverse=True):
-        if itemID not in watched:
+        if itemID not in excluded:
             bookID = trainSet.to_raw_iid(itemID)
 #             print(ml.getItemName(int(bookID)), ratingSum)
             results['book_title'].append(ml.getItemName(int(bookID)))
@@ -69,6 +70,7 @@ def loadrecs_usercf(data, testUser, no_recs):
                 break
                 
     return pd.DataFrame(results)
+# -
 
 # # change project variables
 
@@ -113,7 +115,7 @@ data = ml.loadData(rating_scale_min, rating_scale_max)
 
 # # run for recommendations
 
-loadrecs_usercf(data, testUser, 10)
+user_based_rec_loader(data, testUser, 10)
 
 # # create a new user and get recommendations
 #
@@ -155,6 +157,6 @@ new_rows
 
 data = ml.addUserLoadData(new_rows, rating_scale_min, rating_scale_max)
 
-loadrecs_usercf(data, mockUserID, 10)
+user_based_rec_loader(data, mockUserID, 10)
 
 

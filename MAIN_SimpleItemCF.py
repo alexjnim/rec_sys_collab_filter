@@ -7,7 +7,7 @@ from operator import itemgetter
 import pandas as pd
 
 
-def loadrecs_itemcf(data, testUser, no_recs):
+def item_based_rec_loader(data, testUser, no_recs):
 
     trainSet = data.build_full_trainset()
     
@@ -21,31 +21,32 @@ def loadrecs_itemcf(data, testUser, no_recs):
     model = KNNBasic(sim_options=sim_options)
     model.fit(trainSet)
 
-    simsMatrix = model.compute_similarities()
+    similarity_matrix = model.compute_similarities()
 
     testUserInnerID = trainSet.to_inner_uid(testUser)
     # Get the top K items we rated
-    k = 10
-    testUserRatings = trainSet.ur[testUserInnerID]
-    kNeighbors = heapq.nlargest(k, testUserRatings, key=lambda t: t[1])
+#     k = 10
+#     testUserRatings = trainSet.ur[testUserInnerID]
+#     kNeighbors = heapq.nlargest(k, testUserRatings, key=lambda t: t[1])
 
     #or look for items with rating > threshold
-    #kNeighbors = []
-    #for rating in testUserRatings:
-    #    if rating[1] > 4.0:
-    #        kNeighbors.append(rating)
+    kNeighbors = []
+    testUserRatings = trainSet.ur[testUserInnerID]
+    for rating in testUserRatings:
+       if rating[1] > 4.0:
+           kNeighbors.append(rating)
     
     # Get similar items to stuff we liked (weighted by rating)
     candidates = defaultdict(float)
     for itemID, rating in kNeighbors:
-        similarityRow = simsMatrix[itemID]
-        for innerID, score in enumerate(similarityRow):
+        similarity_row = similarity_matrix[itemID]
+        for innerID, score in enumerate(similarity_row):
             candidates[innerID] += score * (rating / 5.0)
 
     # Build a dictionary of stuff the user has already seen
-    watched = {}
+    excluded = {}
     for itemID, rating in trainSet.ur[testUserInnerID]:
-        watched[itemID] = 1
+        excluded[itemID] = 1
     
     # Build a dictionary for results
     results = {'book': [], 'rating_sum': []}
@@ -54,7 +55,7 @@ def loadrecs_itemcf(data, testUser, no_recs):
     print('\n')
     pos = 0
     for itemID, ratingSum in sorted(candidates.items(), key=itemgetter(1), reverse=True):
-        if not itemID in watched:
+        if not itemID in excluded:
             bookID = trainSet.to_raw_iid(itemID)
 #             print(ml.getItemName(int(bookID)), ratingSum)
             results['book'].append(ml.getItemName(int(bookID)))
@@ -96,7 +97,7 @@ merged_data[merged_data['user_id'] == testUser].sort_values(by=['rating'], ascen
 ml = DataLoader(items_path, ratings_path, userID_column, itemID_column, ratings_column, itemName_column, size_of_data)
 data = ml.loadData(rating_scale_min, rating_scale_max)
 
-loadrecs_itemcf(data, testUser, 10)
+item_based_rec_loader(data, testUser, 10)
 
 # # select a single item and find items similar to that
 #
@@ -138,7 +139,7 @@ result
 # +
 data = ml.addUserLoadData(new_rows, rating_scale_min, rating_scale_max)
 
-loadrecs_itemcf(data, mockUserID, 10)
+item_based_rec_loader(data, mockUserID, 10)
 # -
 
 
