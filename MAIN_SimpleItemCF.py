@@ -65,7 +65,6 @@ def item_based_rec_loader(data, testUser, no_recs):
                 break
     return pd.DataFrame(results)
 
-# +
 items_path = '../data/goodbooks-10k-master/books.csv'
 ratings_path = '../data/goodbooks-10k-master/ratings.csv'
 itemID_column = 'book_id'
@@ -75,15 +74,10 @@ itemName_column = 'title'
 rating_scale_min = 1
 rating_scale_max = 5
 
-# please check how large your ratings.csv is, the larger it is the longer it'll take to run!
-# 5 million entries is far too much!
-size_of_data = 100000
-
 # +
+# here we don't need to worry too much about the size of ratings.csv even though its 5 million rows!
+# with item-based CF, the dimensions of the similarity matrix will be the size of number of unique items, here 10,000
 ratings = pd.read_csv(ratings_path)
-print('shape of original ratings was: ', ratings.shape)
-ratings = ratings[:size_of_data]
-print('shape of ratings is now: ', ratings.shape)
 items = pd.read_csv(items_path)
 
 result = pd.merge(ratings, items[[itemID_column, itemName_column]], how='left', on=[itemID_column])
