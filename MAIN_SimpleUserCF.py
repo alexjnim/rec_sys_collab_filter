@@ -103,7 +103,7 @@ merged_data = result[[userID_column, itemID_column, itemName_column, ratings_col
 
 # # choose a user and the numeber of recommendations wanted
 
-testUser = 78
+testUser = 8 #78
 
 merged_data[merged_data['user_id'] == testUser].sort_values(by=['rating'], ascending =False).head(20)
 

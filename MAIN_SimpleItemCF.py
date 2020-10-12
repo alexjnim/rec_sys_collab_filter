@@ -79,7 +79,27 @@ rating_scale_max = 5
 # with item-based CF, the dimensions of the similarity matrix will be the size of number of unique items, here 10,000
 # size_of_data = len(ratings)
 
-size_of_data = 10000
+size_of_data = 100000
+# -
+
+df.columns
+
+df = pd.read_csv(items_path)
+titles = df['title'].unique()
+
+# +
+text_file = open("Output.txt", "w")
+
+
+for i in range(len(titles)):
+    text_file.write("<option value=\"%s\">" % str(titles[i]))
+    print("<option value=\""+str(titles[i])+"\">")
+    
+
+text_file.close()
+# -
+
+
 
 # +
 ratings = pd.read_csv(ratings_path)
@@ -89,12 +109,12 @@ result = pd.merge(ratings, items[[itemID_column, itemName_column]], how='left', 
 merged_data = result[[userID_column, itemID_column, itemName_column, ratings_column]]
 # -
 
-testUser = 78
-merged_data[merged_data['user_id'] == testUser].sort_values(by=['rating'], ascending =False).head(20)
-
 # Load our data set and compute the user similarity matrix
 ml = DataLoader(items_path, ratings_path, userID_column, itemID_column, ratings_column, itemName_column, size_of_data)
 data = ml.loadData(rating_scale_min, rating_scale_max)
+
+testUser = 8 #78
+merged_data[merged_data['user_id'] == testUser].sort_values(by=['rating'], ascending =False).head(20)
 
 item_based_rec_loader(data, testUser, 10)
 
@@ -112,6 +132,10 @@ selected_items = [485, 592, 1041, 479, 95, 4106, 1135, 130, 959, 2342, 4634, 109
 selected_ratings = []
 #can manually input the ratings per item
 #selected_ratings = [5, 5, 5, 5, 5, 4]
+# -
+
+max_rating = ratings['rating'].max()
+max_rating
 
 # +
 # this code will build new dataframe with the new items and ratings
