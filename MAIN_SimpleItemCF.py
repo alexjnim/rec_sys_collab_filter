@@ -82,10 +82,10 @@ rating_scale_max = 5
 size_of_data = 100000
 # -
 
-df.columns
-
 df = pd.read_csv(items_path)
 titles = df['title'].unique()
+
+df.columns
 
 # +
 text_file = open("Output.txt", "w")
